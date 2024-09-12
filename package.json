@@ -1,0 +1,11 @@
+{
+  "name": "web-components-signals-demo",
+  "private": "true",
+  "type": "module",
+  "scripts": {
+    "start": "serve"
+  },
+  "devDependencies": {
+    "serve": "^14.2.3"
+  }
+}

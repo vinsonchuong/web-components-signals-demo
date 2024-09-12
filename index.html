@@ -1,0 +1,62 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Web Components Signals Demo</title>
+
+<script type="module">
+  import {Signal} from 'https://esm.sh/signal-polyfill'
+  import {effect} from 'https://esm.sh/signal-utils/subtle/microtask-effect'
+
+  class Component1 extends HTMLElement {
+    static observedAttributes = ['data']
+    data = new Signal.State('0')
+
+    // Update rendered HTML when data signal is updated
+    connectedCallback() {
+      effect(() => {
+        this.shadowRoot.querySelector('span').textContent = this.data.get()
+        this.shadowRoot.querySelector('wc-component2').setAttribute('data', this.data.get())
+      })
+
+      this.shadowRoot.querySelector('button').addEventListener('click', () => {
+        this.data.set(String(Number(this.data.get()) + 1))
+      })
+    }
+
+    // Update data signal when data HTML atttribute is set
+    attributeChangedCallback(name, oldValue, newValue) {
+      this[name].set(newValue)
+    }
+  }
+  customElements.define('wc-component1', Component1)
+
+
+  class Component2 extends HTMLElement {
+    static observedAttributes = ['data']
+    data = new Signal.State('0')
+
+    connectedCallback() {
+      effect(() => {
+        this.shadowRoot.querySelector('span').textContent = this.data.get()
+      })
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+      this[name].set(newValue)
+    }
+  }
+  customElements.define('wc-component2', Component2)
+</script>
+
+<wc-component1 data="0">
+  <template shadowrootmode="open">
+    <p>Component 1: <span>0</span></p>
+
+    <wc-component2 data="0">
+      <template shadowrootmode="open">
+        <p>Component 2: <span>0</span></p>
+      </template>
+    </wc-component2>
+
+    <button>Increment</button>
+  </template>
+</wc-component1>
